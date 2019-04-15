@@ -9,6 +9,21 @@
 import SpriteKit
 
 class GameScene: SKScene {
+    // MARK: - Properties
+    var gameScore: SKLabelNode!
+    
+    var score = 0 {
+        didSet {
+            gameScore.text = "Score: \(score)"
+        }
+    }
+    
+    var ammonitions: SKSpriteNode!
+    var ammonitionsLeft = 6 {
+        didSet {
+            ammonitions.texture = SKTexture(imageNamed: "ammo\(ammonitionsLeft)")
+        }
+    }
     
     override func didMove(to view: SKView) {
         createBackground()
@@ -66,5 +81,20 @@ class GameScene: SKScene {
         curtains.size = view!.frame.size
         curtains.zPosition = 400
         addChild(curtains)
+        
+        gameScore = SKLabelNode(fontNamed: "Chalkduster")
+        gameScore.text = "Score: 0"
+        gameScore.position = CGPoint(x: 750, y: 55)
+        gameScore.zPosition = 500
+        gameScore.fontSize = 40
+        gameScore.fontColor = .white
+        addChild(gameScore)
+        
+        ammonitions = SKSpriteNode(imageNamed: "ammo6")
+        ammonitions.position = CGPoint(x: 274, y: 67)
+        ammonitions.xScale = 1.5
+        ammonitions.yScale = 1.5
+        ammonitions.zPosition = 500
+        addChild(ammonitions)
     }
 }
