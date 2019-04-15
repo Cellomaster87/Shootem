@@ -25,10 +25,50 @@ class GameScene: SKScene {
         }
     }
     
+    var gameTimer: Timer?
+    var timerLabel: SKLabelNode!
+    var timeRemaining = 60 {
+        didSet {
+            timerLabel.text = "Time: \(timeRemaining)"
+        }
+    }
+    
+    var targetCreationTimer: Timer?
+    var targetCreationInterval = 0.8
+    var targetSpeed = 4.0
+    var targetsCreated = 0
+    
     override func didMove(to view: SKView) {
         createBackground()
         createWater()
         createOverlay()
+        
+        startGame()
+    }
+    
+    // MARK: - Game Logic
+    func startGame() {
+        run(SKAction.playSoundFileNamed("reload", waitForCompletion: false))
+        
+        score = 0; ammonitionsLeft = 6; timeRemaining = 60
+        
+        gameTimer?.invalidate()
+        gameTimer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(updateGameTimer), userInfo: nil, repeats: true)
+    }
+    
+    @objc func levelUp() {
+        
+    }
+    
+    @objc func updateGameTimer() {
+        timeRemaining -= 1
+        if timeRemaining == 0 {
+            gameOver()
+        }
+    }
+    
+    func gameOver() {
+        
     }
     
     override func update(_ currentTime: TimeInterval) {
@@ -84,17 +124,23 @@ class GameScene: SKScene {
         
         gameScore = SKLabelNode(fontNamed: "Chalkduster")
         gameScore.text = "Score: 0"
-        gameScore.position = CGPoint(x: 750, y: 55)
+        gameScore.position = CGPoint(x: 924, y: 725)
         gameScore.zPosition = 500
-        gameScore.fontSize = 40
         gameScore.fontColor = .white
         addChild(gameScore)
         
         ammonitions = SKSpriteNode(imageNamed: "ammo6")
-        ammonitions.position = CGPoint(x: 274, y: 67)
+        ammonitions.position = CGPoint(x: 512, y: 67)
         ammonitions.xScale = 1.5
         ammonitions.yScale = 1.5
         ammonitions.zPosition = 500
         addChild(ammonitions)
+        
+        timerLabel = SKLabelNode(fontNamed: "Chalkduster")
+        timerLabel.text = "Time: 60"
+        timerLabel.position = CGPoint(x: 100, y: 725)
+        timerLabel.zPosition = 500
+        addChild(timerLabel)
+        
     }
 }
