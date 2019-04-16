@@ -34,9 +34,8 @@ class GameScene: SKScene {
     }
     
     var targetCreationTimer: Timer?
-    var targetCreationInterval = 0.8
+    var targetCreationInterval = 1.2
     var targetSpeed = 4.0
-    var targetsCreated = 0
     
     var isGameOver = false // a very useful switch
     
@@ -65,6 +64,8 @@ class GameScene: SKScene {
                 newGame.scaleMode = .aspectFill
                 let transition = SKTransition.doorway(withDuration: 1)
                 view?.presentScene(newGame, transition: transition)
+                targetSpeed *= 1.1
+                targetCreationInterval *= 0.9
             }
         } else {
             if ammonitionsLeft > 0 {
@@ -149,11 +150,11 @@ class GameScene: SKScene {
             
             switch name {
             case "bigTarget":
-                score += 20
+                score += 10
             case "maleDuckTarget":
-                score -= 5
+                score -= 15
             case "femaleDuckTarget":
-                score -= 10
+                score -= 20
             case "showerDuckTarget":
                 score += 5
             default:
@@ -172,6 +173,9 @@ class GameScene: SKScene {
     }
     
     func gameOver() {
+        targetCreationTimer?.invalidate()
+        gameTimer?.invalidate()
+        
         isGameOver = true
         
         let gameOverTitle = SKSpriteNode(imageNamed: "game-over")
