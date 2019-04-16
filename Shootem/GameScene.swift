@@ -34,7 +34,7 @@ class GameScene: SKScene {
     }
     
     var targetCreationTimer: Timer?
-    var targetCreationInterval = 1.2
+    var targetCreationInterval = 0.8
     var targetSpeed = 4.0
     
     var isGameOver = false // a very useful switch
@@ -64,7 +64,7 @@ class GameScene: SKScene {
                 newGame.scaleMode = .aspectFill
                 let transition = SKTransition.doorway(withDuration: 1)
                 view?.presentScene(newGame, transition: transition)
-                targetSpeed *= 1.1
+                targetSpeed *= 0.9
                 targetCreationInterval *= 0.9
             }
         } else {
@@ -94,6 +94,7 @@ class GameScene: SKScene {
     @objc func createTarget() {
         let target = Target()
         target.create()
+        
         var isMovingRight = true // sets whether the target is moving from left to right or viceversa
         
         // on which level to create it
@@ -120,9 +121,13 @@ class GameScene: SKScene {
         let move: SKAction
         if isMovingRight {
             target.position.x = -100 // just out of the screen to the left
+            targetSpeed = Double.random(in: targetSpeed / 2 ... targetSpeed * 1.5)
+            target.velocity = CGFloat(targetSpeed)
             move = SKAction.moveTo(x: 1124, duration: targetSpeed)
         } else {
             target.position.x = 1124 // just out of the screen to the right
+            targetSpeed = Double.random(in: targetSpeed / 2 ... targetSpeed * 1.5)
+            target.velocity = CGFloat(targetSpeed)
             move = SKAction.moveTo(x: -100, duration: targetSpeed)
         }
         
@@ -150,13 +155,13 @@ class GameScene: SKScene {
             
             switch name {
             case "bigTarget":
-                score += 10
+                score += Int(hitNode.velocity * 2.5)
             case "maleDuckTarget":
-                score -= 15
+                score -= Int(hitNode.velocity * 3.75)
             case "femaleDuckTarget":
-                score -= 20
+                score -= Int(hitNode.velocity * 5)
             case "showerDuckTarget":
-                score += 5
+                score += Int(hitNode.velocity * 1.25)
             default:
                 score += 0
             }

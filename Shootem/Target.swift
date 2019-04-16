@@ -11,6 +11,7 @@ import SpriteKit
 class Target: SKNode {
     var target: SKSpriteNode!
     var stick: SKSpriteNode!
+    var velocity: CGFloat!
     
     func create() {
         let stickType = Int.random(in: 0...2)
@@ -18,6 +19,7 @@ class Target: SKNode {
         
         stick = SKSpriteNode(imageNamed: "stick\(stickType)")
         target = SKSpriteNode(imageNamed: "target\(targetType)")
+        velocity = 0.0
         
         switch targetType {
         case 0:
