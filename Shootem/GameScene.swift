@@ -137,24 +137,38 @@ class GameScene: SKScene {
         // image is automatically updated by the didSet property observer
     }
     
-    func shot(at location: CGPoint) {        
+    func shot(at location: CGPoint) {
+//        let theNodes = nodes(at: location)
+//        guard let firstNode = theNodes.first else { return }
+//
+//        if let name = firstNode.name {
+//            if name.contains("Target") {
+//                guard let parentNode = firstNode.parent as? Target else { return }
+//
+//                parentNode.isHit()
+//                switch parentNode.target.name {
+//                case "bigTarget":
+//                    score += 20
+//                case "maleDuckTarget":
+//                    score -= 5
+//                case "femaleDuckTarget":
+//                    score -= 10
+//                case "showerDuckTarget":
+//                    score += 5
+//                default:
+//                    score += 0
+//                }
+//            } else {
+//                return
+//            }
+//        } else {
+//            return
+//        }
+
         let hitNodes = nodes(at: location).filter { $0.name == "target" }
-        
+
         guard let hitNode = hitNodes.first else { return }
         guard let parentNode = hitNode.parent as? Target else { return } // why is this? Because each target is composed of a target and of a stick.
-        
-//        switch parentNode.target.name {
-//        case "bigTarget":
-//            score += 20
-//        case "maleDuckTarget":
-//            score -= 5
-//        case "femaleDuckTarget":
-//            score -= 10
-//        case "showerDuckTarget":
-//            score += 5
-//        default:
-//            score += 0
-//        }
         
         parentNode.isHit()
         score += 3
