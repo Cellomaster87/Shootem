@@ -62,7 +62,7 @@ class GameScene: SKScene {
         
         if isGameOver {
             if let newGame = SKScene(fileNamed: "GameScene") {
-                newGame.size = view?.frame.size ?? CGSize(width: 1024, height: 768)
+                newGame.scaleMode = .aspectFill
                 let transition = SKTransition.doorway(withDuration: 1)
                 view?.presentScene(newGame, transition: transition)
             }
@@ -140,11 +140,28 @@ class GameScene: SKScene {
     func shot(at location: CGPoint) {
         let hitNodes = nodes(at: location).filter { $0.name == "target" }
 
-        guard let hitNode = hitNodes.first else { return }
-        guard let parentNode = hitNode.parent as? Target else { return } // why is this? Because each target is composed of a target and of a stick.
+        guard let hitNode = hitNodes.first as? Target else { return }
         
-        parentNode.isHit()
-        score += 3
+        guard let children = hitNode.children as? [SKSpriteNode] else { return }
+        
+        for child in children {
+            guard let name = child.name else { continue }
+            
+            switch name {
+            case "bigTarget":
+                score += 20
+            case "maleDuckTarget":
+                score -= 5
+            case "femaleDuckTarget":
+                score -= 10
+            case "showerDuckTarget":
+                score += 5
+            default:
+                score += 0
+            }
+            
+            hitNode.isHit()
+        }
     }
     
     @objc func updateGameTimer() {
@@ -240,31 +257,3 @@ class GameScene: SKScene {
         addChild(timerLabel)
     }
 }
-
-// alternative code for the shot() method
-//        let theNodes = nodes(at: location)
-//        guard let firstNode = theNodes.first else { return }
-//
-//        if let name = firstNode.name {
-//            if name.contains("Target") {
-//                guard let parentNode = firstNode.parent as? Target else { return }
-//
-//                parentNode.isHit()
-//                switch parentNode.target.name {
-//                case "bigTarget":
-//                    score += 20
-//                case "maleDuckTarget":
-//                    score -= 5
-//                case "femaleDuckTarget":
-//                    score -= 10
-//                case "showerDuckTarget":
-//                    score += 5
-//                default:
-//                    score += 0
-//                }
-//            } else {
-//                return
-//            }
-//        } else {
-//            return
-//        }
