@@ -19,7 +19,18 @@ class Target: SKNode {
         stick = SKSpriteNode(imageNamed: "stick\(stickType)")
         target = SKSpriteNode(imageNamed: "target\(targetType)")
         
-        target.name = "target" // to identify it later for destruction
+//        switch targetType {
+//        case 0:
+//            target.name = "bigTarget"
+//        case 1:
+//            target.name = "maleDuckTarget"
+//        case 2:
+//            target.name = "femaleDuckTarget"
+//        default:
+//            target.name = "showerDuckTarget"
+//        }
+        
+        target.name = "target"
         target.position.y += 116 // why this? Possibly the offset from the bottom of the screen
         
         addChild(stick)

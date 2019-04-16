@@ -49,6 +49,34 @@ class GameScene: SKScene {
         startGame()
     }
     
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        guard let touch = touches.first else { return }
+        let location = touch.location(in: self)
+        let nodesAtPoint = nodes(at: location)
+        
+        // Reload ammonitions
+        if nodesAtPoint.contains(where: { $0.name == "ammonitions" }) {
+            reload()
+            return
+        }
+        
+        if isGameOver {
+            if let newGame = SKScene(fileNamed: "GameScene") {
+                let transition = SKTransition.doorway(withDuration: 1)
+                view?.presentScene(newGame, transition: transition)
+                // why it doesn't launch at the same size?
+            }
+        } else {
+            if ammonitionsLeft > 0 {
+                run(SKAction.playSoundFileNamed("shot", waitForCompletion: false))
+                ammonitionsLeft -= 1
+                shot(at: location)
+            } else {
+                run(SKAction.playSoundFileNamed("empty", waitForCompletion: false))
+            }
+        }
+    }
+    
     // MARK: - Game Logic
     func startGame() {
         run(SKAction.playSoundFileNamed("reload", waitForCompletion: false))
@@ -102,6 +130,36 @@ class GameScene: SKScene {
         addChild(target)
     }
     
+    func reload() {
+        guard ammonitionsLeft == 0 else { return }
+        ammonitionsLeft = 6
+        run(SKAction.playSoundFileNamed("reload", waitForCompletion: false))
+        // image is automatically updated by the didSet property observer
+    }
+    
+    func shot(at location: CGPoint) {        
+        let hitNodes = nodes(at: location).filter { $0.name == "target" }
+        
+        guard let hitNode = hitNodes.first else { return }
+        guard let parentNode = hitNode.parent as? Target else { return } // why is this? Because each target is composed of a target and of a stick.
+        
+//        switch parentNode.target.name {
+//        case "bigTarget":
+//            score += 20
+//        case "maleDuckTarget":
+//            score -= 5
+//        case "femaleDuckTarget":
+//            score -= 10
+//        case "showerDuckTarget":
+//            score += 5
+//        default:
+//            score += 0
+//        }
+        
+        parentNode.isHit()
+        score += 3
+    }
+    
     @objc func updateGameTimer() {
         timeRemaining -= 1
         if timeRemaining == 0 {
@@ -110,11 +168,20 @@ class GameScene: SKScene {
     }
     
     func gameOver() {
+        isGameOver = true
         
-    }
-    
-    override func update(_ currentTime: TimeInterval) {
-        // Called before each frame is rendered
+        let gameOverTitle = SKSpriteNode(imageNamed: "game-over")
+        gameOverTitle.alpha = 0
+        gameOverTitle.setScale(2)
+        
+        let fadeIn = SKAction.fadeIn(withDuration: 0.3)
+        let scaleDown = SKAction.scale(to: 1, duration: 0.3)
+        let sequence = SKAction.sequence([fadeIn, scaleDown])
+        
+        gameOverTitle.run(sequence)
+        gameOverTitle.zPosition = 900
+        gameOverTitle.position = CGPoint(x: 512, y: 384)
+        addChild(gameOverTitle)
     }
     
     // MARK: - Helper methods
@@ -176,6 +243,7 @@ class GameScene: SKScene {
         ammonitions.xScale = 1.5
         ammonitions.yScale = 1.5
         ammonitions.zPosition = 500
+        ammonitions.name = "ammonitions"
         addChild(ammonitions)
         
         timerLabel = SKLabelNode(fontNamed: "Chalkduster")
@@ -183,6 +251,5 @@ class GameScene: SKScene {
         timerLabel.position = CGPoint(x: 100, y: 725)
         timerLabel.zPosition = 500
         addChild(timerLabel)
-        
     }
 }
