@@ -12,7 +12,7 @@ class Target: SKNode {
     var target: SKSpriteNode!
     var stick: SKSpriteNode!
     
-    func createTarget() {
+    func create() {
         let stickType = Int.random(in: 0...2)
         let targetType = Int.random(in: 0...3)
         

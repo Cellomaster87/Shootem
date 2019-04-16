@@ -38,6 +38,9 @@ class GameScene: SKScene {
     var targetSpeed = 4.0
     var targetsCreated = 0
     
+    var isGameOver = false // a very useful switch
+    
+    // MARK: - Scene creation and management
     override func didMove(to view: SKView) {
         createBackground()
         createWater()
@@ -52,12 +55,51 @@ class GameScene: SKScene {
         
         score = 0; ammonitionsLeft = 6; timeRemaining = 60
         
+        targetCreationTimer?.invalidate()
+        targetCreationTimer = Timer.scheduledTimer(timeInterval: targetCreationInterval, target: self, selector: #selector(createTarget), userInfo: nil, repeats: true)
+        
         gameTimer?.invalidate()
         gameTimer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(updateGameTimer), userInfo: nil, repeats: true)
     }
     
-    @objc func levelUp() {
+    @objc func createTarget() {
+        let target = Target()
+        target.create()
+        var isMovingRight = true // sets whether the target is moving from left to right or viceversa
         
+        // on which level to create it
+        let level = Int.random(in: 0...2)
+        switch level {
+        case 0:
+            // in front of the grass
+            target.zPosition = 150
+            target.position.y = 280
+            target.setScale(0.7) // give a sense of perspective
+        case 1:
+            // in front of the water background
+            target.zPosition = 250
+            target.position.y = 220
+            target.setScale(0.85)
+            isMovingRight = false
+        default:
+            // in front of the water foreground
+            target.zPosition = 350
+            target.position.y = 150
+        }
+        
+        // Configure movement
+        let move: SKAction
+        if isMovingRight {
+            target.position.x = -100 // just out of the screen to the left
+            move = SKAction.moveTo(x: 1124, duration: targetSpeed)
+        } else {
+            target.position.x = 1124 // just out of the screen to the right
+            move = SKAction.moveTo(x: -100, duration: targetSpeed)
+        }
+        
+        let sequence = SKAction.sequence([move, SKAction.removeFromParent()])
+        target.run(sequence)
+        addChild(target)
     }
     
     @objc func updateGameTimer() {
